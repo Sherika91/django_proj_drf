@@ -3,13 +3,13 @@ from rest_framework.permissions import IsAuthenticated
 
 from course.paginators.lessons import LessonPaginator
 from course.permissions.lessons_permissions import IsModerator, IsOwner, IsNotModerator
-from course.serializers.lessons import LessonSerializer
+from course.serializers.lessons import LessonSerializer, LessonListSerializer
 from course.models import Lesson
 
 
 # LESSON CRUD VIEWS USING GENERICS APIVIEW
 class LessonListAPIView(generics.ListAPIView):
-    serializer_class = LessonSerializer
+    serializer_class = LessonListSerializer
     queryset = Lesson.objects.all().order_by('-id')
     permission_classes = [IsOwner | IsModerator]
     pagination_class = LessonPaginator
@@ -17,7 +17,7 @@ class LessonListAPIView(generics.ListAPIView):
 
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated, IsModerator]
+    permission_classes = [IsAuthenticated, IsNotModerator]
 
 
 class LessonUpdateAPIView(generics.UpdateAPIView):

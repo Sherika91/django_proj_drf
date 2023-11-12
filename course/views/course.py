@@ -16,7 +16,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         permission_classes = [IsAuthenticated]
         if self.action == "create":
             permission_classes = [IsAuthenticated, IsNotModerator]
-        elif self.action in ['update', 'partial_update']:
+        elif self.action in ['update', 'partial_update, patch, put']:
             permission_classes = [IsAuthenticated, IsOwner | IsModerator]
         elif self.action in ['list']:
             permission_classes = [IsAuthenticated, IsOwner | IsModerator]

@@ -78,15 +78,16 @@ class UserProfileTestCases(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(response.json(),
-                         {'id': 1,
-                          'payment_history': [],
-                          'email': 'user@gmail.com',
-                          'first_name': 'AdminUpdate',
-                          'last_name': 'AdminUpdate',
-                          'phone': '12345678',
-                          'avatar': None,
-                          'role': 'moderator'
-                          }
+                         {
+                             'id': 1,
+                             'payment_history': [],
+                             'email': 'user@gmail.com',
+                             'first_name': 'AdminUpdate',
+                             'last_name': 'AdminUpdate',
+                             'phone': '12345678',
+                             'avatar': None,
+                             'role': 'moderator'
+                         }
                          )
 
     def test_user_delete_profile(self):

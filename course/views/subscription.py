@@ -8,8 +8,10 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
     serializer_class = SubscriptionSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        subscription = serializer.save()
-        subscription.user = self.request.user
-        subscription.course = self.request.pk
-        subscription.save()
+
+class SubscriptionDestroyAPIView(generics.DestroyAPIView):
+    serializer_class = SubscriptionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.request.user

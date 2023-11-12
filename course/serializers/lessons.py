@@ -5,7 +5,7 @@ from course.models import Lesson, Course
 from course.validators.lessons import OnlyYouTubeUrlValidator
 
 
-class LessonSerializer(serializers.ModelSerializer):
+class LessonListSerializer(serializers.ModelSerializer):
     """ Lesson serializer """
     course = SlugRelatedField(slug_field="name", queryset=Course.objects.all())
 
@@ -13,3 +13,9 @@ class LessonSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = '__all__'
         validators = [OnlyYouTubeUrlValidator(field='video')]
+
+
+class LessonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lesson
+        fields = '__all__'

@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
-from users.models import User
+from course.models import Subscription
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = User
+        model = Subscription
         fields = '__all__'
