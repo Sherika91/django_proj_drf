@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from users.models import User
 from users.permissions import IsSelfUser, UserProfileReadOnlySerializer
-from users.serializers import UserProfileSerializer, SubscriptionSerializer
+from users.serializers import UserProfileSerializer
 
 
 class UserProfileListView(generics.ListAPIView):

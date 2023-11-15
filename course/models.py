@@ -21,15 +21,6 @@ class Course(models.Model):
         verbose_name_plural = 'Courses'
 
 
-class Subscription(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='User')
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='Course')
-
-    class Meta:
-        verbose_name = 'Subscription'
-        verbose_name_plural = 'Subscriptions'
-
-
 class Lesson(models.Model):
     name = models.CharField(max_length=255, verbose_name='Lesson Name', )
     description = models.TextField(verbose_name='Lesson Description', )
@@ -38,7 +29,6 @@ class Lesson(models.Model):
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lesson', verbose_name='Course', )
     lesson_owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Lesson Owner',)
-    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE, verbose_name='subscription', null=True)
 
     def __str__(self):
         return f"{self.name}"

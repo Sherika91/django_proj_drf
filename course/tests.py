@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from rest_framework_simplejwt.tokens import AccessToken
 from course.models import Course, Lesson
+from subscription.models import Subscription
 from users.models import User
 
 
@@ -38,6 +39,12 @@ class BaseTestCase(APITestCase):
             course=self.course,
         )
 
+        self.subscription = Subscription.objects.create(
+            course=self.course,
+            user=self.user,
+            is_subscribed=True,
+        )
+
         self.client = APIClient()
         # Get Access Token For Current User (Moderator)
         access_token = AccessToken.for_user(self.user)
@@ -46,6 +53,7 @@ class BaseTestCase(APITestCase):
     def tearDown(self):
         self.course.delete()
         self.user.delete()
+        self.subscription.delete()
 
 
 class CourseTestCases(BaseTestCase):
@@ -56,11 +64,10 @@ class CourseTestCases(BaseTestCase):
             'description': 'Test Description 2',
             'course_owner': self.user.pk
         })
-        print(response.json())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.json(),
                          {
-                             'id': self.course.pk,
+                             'id': 2,
                              'lesson_list': [],
                              'lesson_count': 0,
                              'name': 'Test Course 2',
@@ -81,16 +88,22 @@ class CourseTestCases(BaseTestCase):
                              'next': None,
                              'previous': None,
                              'results': [
-                                 {'id': self.course.pk,
-                                  'lesson_list': [],
-                                  'lesson_count': 0,
-                                  'name': 'Test Course',
-                                  'preview': None,
-                                  'description': 'Test Description',
-                                  'course_owner': self.user.pk}
-                             ]
-                         }
-                         )
+                                 {
+                                     'id': self.course.pk,
+                                     'lesson_list': [{
+                                         'id': self.lesson.pk,
+                                         'name': 'Test Lesson',
+                                         'description': 'Test Description',
+                                         'preview': None,
+                                         'video': None,
+                                         'course': self.course.pk,
+                                         'lesson_owner': self.user.pk
+                                     }],
+                                     'lesson_count': 1,
+                                     'name': 'Test Course',
+                                     'preview': None,
+                                     'description': 'Test Description',
+                                     'course_owner': self.user.pk}]})
 
     def test_get_course(self):
         """ Test For Getting Course Object """
@@ -100,8 +113,15 @@ class CourseTestCases(BaseTestCase):
         self.assertEqual(response.json(),
                          {
                              'id': self.course.pk,
-                             'lesson_list': [],
-                             'lesson_count': 0,
+                             'lesson_list': [{
+                                 'course': self.course.pk,
+                                 'description': 'Test Description',
+                                 'id': self.lesson.pk,
+                                 'lesson_owner': self.user.pk,
+                                 'name': 'Test Lesson',
+                                 'preview': None,
+                                 'video': None}],
+                             'lesson_count': 1,
                              'name': 'Test Course',
                              'preview': None,
                              'description': 'Test Description',
@@ -121,8 +141,15 @@ class CourseTestCases(BaseTestCase):
         self.assertEqual(response.json(),
                          {
                              'id': self.course.pk,
-                             'lesson_list': [],
-                             'lesson_count': 0,
+                             'lesson_list': [{
+                                 'course': self.course.pk,
+                                 'description': 'Test Description',
+                                 'id': self.lesson.pk,
+                                 'lesson_owner': self.user.pk,
+                                 'name': 'Test Lesson',
+                                 'preview': None,
+                                 'video': None}],
+                             'lesson_count': 1,
                              'name': 'Test Course Update',
                              'preview': None,
                              'description': 'Test Description Update',
@@ -149,14 +176,13 @@ class LessonTestCases(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.json(),
                          {
-                             'id': self.lesson.pk,
+                             'id': 3,
                              'name': 'Test Lesson',
                              'description': 'Test Description',
                              'preview': None,
                              'video': None,
                              'course': self.course.pk,
                              'lesson_owner': self.user.pk,
-                             'subscription': None
                          }
                          )
 
@@ -176,7 +202,7 @@ class LessonTestCases(BaseTestCase):
                  'preview': None,
                  'video': None,
                  'lesson_owner': self.user.pk,
-                 'subscription': None
+
                  }
             ]
         }
@@ -195,7 +221,6 @@ class LessonTestCases(BaseTestCase):
                              'video': None,
                              'course': self.course.pk,
                              'lesson_owner': self.user.pk,
-                             'subscription': None
                          }
                          )
 
@@ -215,7 +240,6 @@ class LessonTestCases(BaseTestCase):
                              'video': None,
                              'course': self.course.pk,
                              'lesson_owner': self.user.pk,
-                             'subscription': None
                          }
                          )
 
@@ -227,26 +251,36 @@ class LessonTestCases(BaseTestCase):
 
 class SubscriptionTestCases(BaseTestCase):
     def test_subscription_create(self):
-        response = self.client.post(reverse("course:course-subscribe"), data={
+        response = self.client.post(reverse("subscription:create"), data={
             'course': self.course.pk,
             'user': self.user.pk,
+            'is_subscribed': False,
         }
                                     )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.json(),
                          {
-                             'id': 1,
+                             'id': 2,
                              'course': self.course.pk,
                              'user': self.user.pk,
+                             'is_subscribed': False,
                          }
                          )
 
+    def test_subscription_get_list(self):
+        response = self.client.get(reverse("subscription:list"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(),
+                         [{
+                             'id': self.subscription.pk,
+                             'is_subscribed': True,
+                             'user': self.user.pk,
+                             'course': self.course.pk}
+                         ])
+
     def test_unsubscribe(self):
-        response = self.client.delete(reverse("course:course-unsubscribe", args=[self.course.pk]), data={
-            'course': self.course.pk,
-            'user': self.user.pk,
-        }
-                                      )
+        response = self.client.delete(reverse("subscription:delete", args=[self.subscription.pk]))
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

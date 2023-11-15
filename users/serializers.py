@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from course.serializers.subscription import SubscriptionSerializer
 from payment.models import Payment
 from users.models import User
 
@@ -13,7 +12,6 @@ class PaymentHistorySerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     payment_history = PaymentHistorySerializer(many=True, read_only=True, source='payments')
-    subscription = SubscriptionSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
