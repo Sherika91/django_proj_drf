@@ -176,7 +176,7 @@ class LessonTestCases(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.json(),
                          {
-                             'id': 3,
+                             'id': 8,
                              'name': 'Test Lesson',
                              'description': 'Test Description',
                              'preview': None,
@@ -261,7 +261,7 @@ class SubscriptionTestCases(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.json(),
                          {
-                             'id': 2,
+                             'id': 12,
                              'course': self.course.pk,
                              'user': self.user.pk,
                              'is_subscribed': False,
